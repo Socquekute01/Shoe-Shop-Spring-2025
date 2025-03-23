@@ -16,8 +16,16 @@ const SidebarAdmin = ({ selectedTeam }) => {
 
   const menuItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
-    { name: "Order", icon: <FileText size={20} />, path: "/order" },
-    { name: "Blog", icon: <FileText size={20} />, path: "/blog" },
+    {
+      name: "Order",
+      icon: <FileText size={20} />,
+      path: "/admin/order-management",
+    },
+    {
+      name: "Blog",
+      icon: <Users size={20} />,
+      path: "/admin/blog-management",
+    },
     {
       name: "Product",
       icon: <ShoppingCart size={20} />,

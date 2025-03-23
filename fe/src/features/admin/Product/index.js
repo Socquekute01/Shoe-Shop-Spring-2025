@@ -1,88 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
-import api from "../../../api";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, Edit, Trash2, Eye, ArrowUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import api from '../../../api';
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Nike Air Force 1 NDESTRUKT",
-      price: 35.17,
-      colors: ["green", "black"],
-      sale: true,
-      status: "",
-    },
-    {
-      id: 2,
-      name: "Nike Space Hippie 04",
-      price: 57.22,
-      colors: ["black"],
-      sale: false,
-      status: "",
-    },
-    {
-      id: 3,
-      name: "Nike Air Zoom Pegasus",
-      price: 64.78,
-      oldPrice: 64.78,
-      colors: ["pink"],
-      sale: true,
-      status: "",
-    },
-    {
-      id: 4,
-      name: "Nike Blazer Low 77 Vintage",
-      price: 50.79,
-      colors: ["red", "blue", "white"],
-      sale: false,
-      status: "new",
-    },
-    {
-      id: 5,
-      name: "Nike ZoomX SuperRep",
-      price: 9.57,
-      colors: ["green", "black"],
-      sale: true,
-      status: "",
-    },
-    {
-      id: 6,
-      name: "Zoom Freak 2",
-      price: 61.46,
-      oldPrice: 61.46,
-      colors: ["black", "white"],
-      stock: 5,
-      sale: false,
-      status: "",
-    },
-    {
-      id: 7,
-      name: "Nike Air Max Zephyr",
-      price: 96.73,
-      colors: ["green", "black"],
-      stock: 5,
-      sale: false,
-      status: "",
-    },
-    {
-      id: 8,
-      name: "Jordan Delta",
-      price: 63.04,
-      colors: ["green", "black"],
-      stock: 5,
-      sale: false,
-      status: "new",
-    },
-  ]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await api.getProducts();
         setProducts(response.data);
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        setError('Failed to fetch products');
+        console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
       }
@@ -91,88 +28,172 @@ const ProductsPage = () => {
     fetchProducts();
   }, []);
 
+  // Filter products based on search term
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination
+  const indexOfLastProduct = currentPage * rowsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - rowsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / rowsPerPage);
+
+  const handleDeleteProduct = async (productId) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await api.deleteProduct(productId);
+        setProducts(products.filter(product => product.id !== productId));
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
+    }
+  };
+
+  // Calculate discount percentage
+  const calculateDiscount = (regularPrice, salePrice) => {
+    if (!regularPrice || !salePrice || regularPrice <= 0) return 0;
+    return Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+  };
+
+  // Format price to currency
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
+
+  if (loading) return <div className="flex justify-center p-8">Loading products...</div>;
+  if (error) return <div className="text-red-500 p-8">{error}</div>;
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">Products</h1>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600">Sort By:</span>
-          <button className="px-3 py-1.5 border rounded-lg flex items-center gap-1">
-            Featured
-            <ChevronDown size={16} />
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="bg-white rounded-lg shadow overflow-hidden"
+      <h1 className="text-2xl font-bold mb-8">Products</h1>
+      
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-4 flex justify-between">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+            <input 
+              type="text" 
+              placeholder="Search product..." 
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Link 
+            to="/admin/products/create" 
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            <div className="relative">
-              <div className="h-48 bg-gray-100 flex items-center justify-center">
-                <img
-                  src={`/api/placeholder/300/200`}
-                  alt={product.name}
-                  className="h-full object-cover"
-                />
-              </div>
-              {product.sale && (
-                <div className="absolute top-2 right-2 bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">
-                  SALE
-                </div>
-              )}
-              {product.status === "new" && (
-                <div className="absolute top-2 right-2 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                  NEW
-                </div>
-              )}
-            </div>
-            <div className="p-4">
-              <h3 className="font-medium text-gray-800 mb-2">{product.name}</h3>
-              <div className="flex justify-between items-center">
-                <div className="flex gap-1">
-                  {product.colors.map((color, index) => (
-                    <div
-                      key={index}
-                      className={`w-4 h-4 rounded-full border ${
-                        color === "black"
-                          ? "bg-black"
-                          : color === "white"
-                          ? "bg-white"
-                          : color === "green"
-                          ? "bg-green-500"
-                          : color === "red"
-                          ? "bg-red-500"
-                          : color === "blue"
-                          ? "bg-blue-500"
-                          : color === "pink"
-                          ? "bg-pink-300"
-                          : ""
-                      }`}
-                    />
-                  ))}
-                  {product.stock && (
-                    <span className="text-xs text-gray-500">
-                      +{product.stock}
+            Add Product
+          </Link>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-gray-600 border-b">
+                <th className="px-4 py-3">
+                  <input type="checkbox" className="rounded" />
+                </th>
+                <th className="px-4 py-3 flex items-center gap-1">
+                  Product Name
+                  <ArrowUp size={14} />
+                </th>
+                <th className="px-4 py-3">Regular Price</th>
+                <th className="px-4 py-3">Sale Price</th>
+                <th className="px-4 py-3">Discount</th>
+                <th className="px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentProducts.map((product) => (
+                <tr key={product.id} className="border-b">
+                  <td className="px-4 py-4">
+                    <input type="checkbox" className="rounded" />
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded overflow-hidden bg-gray-100">
+                        <img 
+                          src={product.imageName || 'https://via.placeholder.com/48'} 
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/48';
+                          }}
+                        />
+                      </div>
+                      <span className="font-medium">{product.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">{formatPrice(product.capacityProductPrice)}</td>
+                  <td className="px-4 py-4">{formatPrice(product.capacityProductPriceSale)}</td>
+                  <td className="px-4 py-4">
+                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                      {calculateDiscount(product.capacityProductPrice, product.capacityProductPriceSale)}%
                     </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  {product.oldPrice && (
-                    <span className="text-gray-400 line-through">
-                      ${product.oldPrice.toFixed(2)}
-                    </span>
-                  )}
-                  <span className="font-medium">
-                    ${product.price.toFixed(2)}
-                  </span>
-                </div>
-              </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex space-x-2">
+                      <Link to={`/admin/products/${product.id}`} className="text-blue-500 hover:text-blue-700">
+                        <Eye size={18} />
+                      </Link>
+                      <Link to={`/admin/products/${product.id}/edit`} className="text-yellow-500 hover:text-yellow-700">
+                        <Edit size={18} />
+                      </Link>
+                      <button 
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Rows per page:</span>
+            <select 
+              className="border rounded px-2 py-1 w-[60px]"
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">
+              {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length}
+            </span>
+            <div className="flex">
+              <button 
+                className="p-1 border rounded-l"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                className="p-1 border rounded-r border-l-0"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
