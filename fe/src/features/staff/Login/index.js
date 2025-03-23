@@ -1,10 +1,9 @@
 import { useFormik } from "formik";
+import { Navigate } from "react-router-dom";
 import * as Yup from "yup";
-import axios from "axios";
 import api from "../../../api";
 import useUser from "../../../hooks/useUser";
 import { decodeJWT } from "../../../utils/jwtUtils";
-import { Navigate } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("Required"),
@@ -31,12 +30,13 @@ function LoginPage() {
         if (!response.data || !response.data.userName) {
           throw new Error("Invalid user data from server");
         }
+
         // Cập nhật context user
         setUserInformation({
           userName: response.data.userName,
           name: response.data.name,
           avatar: response.data.avatar,
-          roles: response.data.roles.authority,
+          role: response.data.roles[0].authority,
           accessToken: response.data.token,
         });
 

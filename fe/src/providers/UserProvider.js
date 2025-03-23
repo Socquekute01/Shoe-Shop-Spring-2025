@@ -26,17 +26,7 @@ const UserProvider = ({ children }) => {
           decoded: decodedToken, // Lưu thêm thông tin giải mã
         })
       );
-
       localStorage.setItem("accessToken", userInformation?.accessToken)
-
-      // Cập nhật thông tin từ token nếu cần
-      if (decodedToken && !userInformation.username) {
-        setUserInformation((prev) => ({
-          ...prev,
-          userName: decodedToken.sub,
-          exp: decodedToken.exp,
-        }));
-      }
     } else {
       setUserInformation( () => {
         const savedData = localStorage.getItem("userData");

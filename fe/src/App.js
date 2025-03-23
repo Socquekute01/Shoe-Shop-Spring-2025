@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import { adminRoutes, basicRoutes } from "./routes";
+import useUser from "./hooks/useUser";
 import DefaultLayout from "./layouts";
 import AdminLayout from "./layouts/AdminLayout";
-import useUser from "./hooks/useUser";
-import { useEffect, useState } from "react";
+import { adminRoutes, basicRoutes } from "./routes";
 
 function App() {
   const [userInformation] = useUser();
@@ -20,9 +20,13 @@ function App() {
     );
   });
 
+
   useEffect(() => {
-    if (userInformation?.role === "admin") {
+    if (userInformation?.role === "ROLE_ADMIN") {
       setIsAdmin(true);
+      if (!window.location.href.includes("admin")) {
+        window.location.href = "/admin";
+      }
     }
   }, [userInformation]);
 

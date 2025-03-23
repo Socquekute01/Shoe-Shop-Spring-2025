@@ -37,10 +37,30 @@ export default {
   getDashboardStats: () => api.get("/api/admin/stats"),
   getOrders: (params) => api.get("/api/orders", { params }),
   getProducts: (params) => api.get("/api/products", { params }),
-  getUsers: (params) => api.get("/api/admin/users", { params }),
+  //user
+  getUsers: () => api.get("/customer"),
+  getUserById: (id) => api.get(`/customer/detail/${id}`),
+  updateUserById: (id, userData) =>
+    api.put(`/customer/detail/${id}`, userData),
+  deleteUserById: (id) => api.delete(`/customer/delete/${id}`),
 
   // User
   updateProfile: (data) => api.put("/api/users/me", data),
   getCart: () => api.get("/api/carts"),
   updateCart: (data) => api.put("/api/carts", data),
+
+  // User management endpoints
+  getUser: (id) => api.get(`/users/${id}`),
+  createUser: (userData) => api.post("/users", userData),
+  updateUser: (id, userData) => api.put(`/users/${id}`, userData),
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  uploadAvatar: (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };

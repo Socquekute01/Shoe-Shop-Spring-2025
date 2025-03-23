@@ -15,11 +15,17 @@ const SidebarAdmin = ({ selectedTeam }) => {
   const currentPath = location.pathname;
 
   const menuItems = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
-    { name: 'Order', icon: <FileText size={20} />, path: '/order' },
-    { name: 'Product', icon: <ShoppingCart size={20} />, path: '/admin/product-management', badge: '+3' },
-    { name: 'User', icon: <User size={20} />, path: '/admin/user-management' },
-    { name: 'Sign in', icon: <LogIn size={20} />, path: '/signin' },
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
+    { name: "Order", icon: <FileText size={20} />, path: "/order" },
+    { name: "Blog", icon: <FileText size={20} />, path: "/blog" },
+    {
+      name: "Product",
+      icon: <ShoppingCart size={20} />,
+      path: "/admin/product-management",
+      badge: "+3",
+    },
+    { name: "User", icon: <User size={20} />, path: "/admin/user-management" },
+    { name: "Sign in", icon: <LogIn size={20} />, path: "/signin" },
   ];
 
   return (

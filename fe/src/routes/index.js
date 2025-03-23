@@ -19,8 +19,4 @@ const basicRoutes = [
   { path: "/*", element: Page404 },
 ];
 
-export { 
-  basicRoutes,
-  adminRoutes
-}
-
+export { basicRoutes, adminRoutes };
