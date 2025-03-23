@@ -11,5 +11,4 @@ export const adminRoutes = [
   { path: "/admin/user-management", element: UsersPage },
   { path: "/admin/product-management", element: ProductPage },  
   { path: "/admin/*", element: Page404 },
-
 ];

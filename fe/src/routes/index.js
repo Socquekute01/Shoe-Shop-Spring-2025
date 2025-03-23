@@ -1,3 +1,4 @@
+import Page404 from "../features/page404";
 import AccountPage from "../features/staff/Account";
 import CartPage from "../features/staff/Cart";
 import CollectionPage from "../features/staff/Collection";
@@ -15,8 +16,8 @@ const basicRoutes = [
   { path: "/product", element: ProductPage },
   { path: "/cart", element: CartPage },
   { path: "/account", element: AccountPage },
-
-]
+  { path: "/*", element: Page404 },
+];
 
 export { 
   basicRoutes,

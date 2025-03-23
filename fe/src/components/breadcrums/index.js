@@ -1,15 +1,15 @@
-function BreadCums({title}) {
-    return (
-      <div class="container py-4 flex items-center gap-3">
-        <a href="../index.html" class="text-primary text-base">
-          <i class="fa-solid fa-house"></i>
-        </a>
-        <span class="text-sm text-gray-400">
-          <i class="fa-solid fa-chevron-right"></i>
-        </span>
-        <p class="text-gray-600 font-medium">{title}</p>
-      </div>
-    );
+function BreadCums({ title }) {
+  return (
+    <div className="container py-4 flex items-center gap-3">
+      <a href="../index.html" className="text-primary text-base">
+        <i className="fa-solid fa-house"></i>
+      </a>
+      <span className="text-sm text-gray-400">
+        <i className="fa-solid fa-chevron-right"></i>
+      </span>
+      <p className="text-gray-600 font-medium">{title}</p>
+    </div>
+  );
 }
 
 export default BreadCums;

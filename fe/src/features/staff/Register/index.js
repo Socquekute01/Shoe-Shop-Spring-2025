@@ -3,11 +3,16 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import api from "../../../api";
+import { Navigate } from "react-router-dom";
+import useUser from "../../../hooks/useUser";
 
 const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
+  phoneNumber: Yup.string().required("Required"),
+  username: Yup.string().required("Required"),
+  dateOfBirth: Yup.date().required("Required"),
+  address: Yup.string().required("Required"),
+  gender: Yup.boolean().required("Required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Required"),
@@ -17,6 +22,7 @@ const validationSchema = Yup.object().shape({
 });
 
 function RegisterPage() {
+  const [userInformation] = useUser();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,22 +34,35 @@ function RegisterPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       email: "",
+      phoneNumber: "",
+      username: "",
+      dateOfBirth: "",
+      address: "",
+      gender: true,
       password: "",
       confirmPassword: "",
+      avatar: "",
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       try {
+        setLoading(true);
         await api.register({
-          first_name: values.firstName,
-          last_name: values.lastName,
           email: values.email,
+          phoneNumber: values.phoneNumber,
+          username: values.username,
+          dateOfBirth: values.dateOfBirth,
+          address: values.address,
+          gender: values.gender,
           password: values.password,
+          avatar: values.avatar,
+          name: values.name,
+          confirmPassword: values.confirmPassword,
         });
         // Redirect to login after successful registration
         window.location.href = "/login";
@@ -51,12 +70,16 @@ function RegisterPage() {
         setErrors({
           general: error.response?.data?.message || "Registration failed",
         });
+        setError(error.response?.data?.message || "Registration failed");
       } finally {
         setSubmitting(false);
+        setLoading(false);
       }
     },
   });
-
+  if (userInformation && userInformation?.userName) {
+    return <Navigate to="/" replace />;
+  }  
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     setFormData({
@@ -136,42 +159,41 @@ function RegisterPage() {
         <form onSubmit={formik.handleSubmit} method="post" autoComplete="off">
           <div className="space-y-2">
             <div>
-              <label htmlFor="firstName" className="text-gray-600 mb-2 block">
-                First Name
+              <label htmlFor="name" className="text-gray-600 mb-2 block">
+                Full Name
               </label>
               <input
                 type="text"
-                name="firstName"
-                id="firstName"
+                name="name"
+                id="name"
                 className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                 placeholder="John"
-                value={formik.values.firstName}
+                value={formik.values.name}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.firstName && formik.errors.firstName ? (
-                <div className="text-red-500 text-sm">
-                  {formik.errors.firstName}
-                </div>
+              {formik.touched.name && formik.errors.name ? (
+                <div className="text-red-500 text-sm">{formik.errors.name}</div>
               ) : null}
             </div>
+
             <div>
-              <label htmlFor="lastName" className="text-gray-600 mb-2 block">
-                Last Name
+              <label htmlFor="username" className="text-gray-600 mb-2 block">
+                Username
               </label>
               <input
                 type="text"
-                name="lastName"
-                id="lastName"
+                name="username"
+                id="username"
                 className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                placeholder="Doe"
-                value={formik.values.lastName}
+                placeholder="johndoe123"
+                value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.lastName && formik.errors.lastName ? (
+              {formik.touched.username && formik.errors.username ? (
                 <div className="text-red-500 text-sm">
-                  {formik.errors.lastName}
+                  {formik.errors.username}
                 </div>
               ) : null}
             </div>
@@ -192,6 +214,99 @@ function RegisterPage() {
               {formik.touched.email && formik.errors.email ? (
                 <div className="text-red-500 text-sm">
                   {formik.errors.email}
+                </div>
+              ) : null}
+            </div>
+            <div>
+              <label htmlFor="phoneNumber" className="text-gray-600 mb-2 block">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                name="phoneNumber"
+                id="phoneNumber"
+                className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
+                placeholder="0983431215"
+                value={formik.values.phoneNumber}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.phoneNumber}
+                </div>
+              ) : null}
+            </div>
+            <div>
+              <label htmlFor="dateOfBirth" className="text-gray-600 mb-2 block">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                name="dateOfBirth"
+                id="dateOfBirth"
+                className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
+                value={formik.values.dateOfBirth}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.dateOfBirth}
+                </div>
+              ) : null}
+            </div>
+            <div>
+              <label htmlFor="address" className="text-gray-600 mb-2 block">
+                Address
+              </label>
+              <input
+                type="text"
+                name="address"
+                id="address"
+                className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
+                placeholder="Your address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.address && formik.errors.address ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.address}
+                </div>
+              ) : null}
+            </div>
+            <div>
+              <label className="text-gray-600 mb-2 block">Gender</label>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    id="genderMale"
+                    value="true"
+                    checked={formik.values.gender === true}
+                    onChange={() => formik.setFieldValue("gender", true)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="genderMale">Male</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    id="genderFemale"
+                    value="false"
+                    checked={formik.values.gender === false}
+                    onChange={() => formik.setFieldValue("gender", false)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="genderFemale">Female</label>
+                </div>
+              </div>
+              {formik.touched.gender && formik.errors.gender ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.gender}
                 </div>
               ) : null}
             </div>
@@ -239,6 +354,21 @@ function RegisterPage() {
                 </div>
               ) : null}
             </div>
+            <div>
+              <label htmlFor="avatar" className="text-gray-600 mb-2 block">
+                Avatar (Optional)
+              </label>
+              <input
+                type="file"
+                name="avatar"
+                id="avatar"
+                className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary"
+                onChange={(event) => {
+                  // formik.setFieldValue("avatar", event.currentTarget.files[0]);
+                  formik.setFieldValue("avatar", "");
+                }}
+              />
+            </div>
           </div>
           <div className="mt-6">
             <div className="flex items-center">
@@ -265,7 +395,7 @@ function RegisterPage() {
             <button
               type="submit"
               className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium"
-              disabled={loading}
+              disabled={loading || formik.isSubmitting}
             >
               {loading ? "Processing..." : "create account"}
             </button>

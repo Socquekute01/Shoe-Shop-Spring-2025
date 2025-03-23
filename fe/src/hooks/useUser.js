@@ -5,23 +5,23 @@ import api from "../api";
 export default function useUser() {
   const userContext = useContext(UserContext);
   const { userInformation, setUserInformation } = userContext;
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await api.getMe();
-        setUser(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       if (!userInformation || !userInformation?.id) {
+  //         setUserInformation(null);
+  //         return
+  //       }
+  //       const response = await api.getMe(userInformation?.id);
+  //       setUserInformation(response.data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch user:", error.message);
+  //     }
+  //   };
 
-    fetchUser();
-  }, []);
+  //   fetchUser();
+  // }, []);
 
-  const handleChangeUserInformation = (value) => {
-    setUserInformation(value);
-  };
-  return [user, setUserInformation, handleChangeUserInformation];
+  return [userInformation, setUserInformation];
 }
